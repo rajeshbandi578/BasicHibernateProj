@@ -9,13 +9,19 @@ package com.mph.entity;
 
 import java.util.List;
 
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.NamedQueries;
+
+@NamedQueries({@NamedQuery(name = "GET_EMP_BYNAME", query = "from Emp e where e.name=:name"),
+				@NamedQuery(name = "GET_EMP_BYID", query = "from Emp e where e.eno=:eno")})
 
 @Entity
 @Table(name="EMPLOYEE")

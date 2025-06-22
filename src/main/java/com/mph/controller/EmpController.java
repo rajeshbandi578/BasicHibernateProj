@@ -8,6 +8,7 @@ package com.mph.controller;
  */
 
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Scanner;
 
@@ -20,6 +21,12 @@ import org.hibernate.query.Query;
 import com.mph.entity.Address;
 import com.mph.entity.Department;
 import com.mph.entity.Emp;
+
+
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
 
 
 
@@ -82,6 +89,67 @@ public class EmpController {
 			for(Emp e : elist) {
 				System.out.println(e.toString());
 			}
+			session.close();
+		}
+		
+		public void selectUsingNamedQuery() {
+			Session session=sessionFactory.openSession();
+			txn=session.beginTransaction();
+			Query<Emp> q=session.createNamedQuery("GET_EMP_BYNAME",Emp.class).setParameter("name", "Raj");
+			Emp e=q.uniqueResult();
+			System.out.println("Emp fetched using Named query : "+e.toString());
+			
+		}
+		
+		public void deleteEmployee() {
+			Session session=sessionFactory.openSession();
+			txn=session.beginTransaction();
+			Scanner sc =new Scanner(System.in);
+			System.out.println("Enter Emp number to be deleted : ");
+			int en = sc.nextInt();
+			Emp e=session.get( Emp.class, en);
+			if(e!=null) {
+				session.remove(e);
+			}
+			txn.commit();
+			session.close();
+		}
+		
+		public void updateEmployee() {
+			Session session=sessionFactory.openSession();
+			txn=session.beginTransaction();
+			Scanner sc =new Scanner(System.in);
+			System.out.println("Enter Emp number to be updated : ");
+			int en = sc.nextInt();
+			sc.nextLine();
+			Emp e = session.get(Emp.class, en);
+			System.out.println("Enter new name");
+			e.setName(sc.nextLine());
+			if(e!=null) {
+			session.merge(e);
+			}
+			txn.commit();
+			session.close();
+			
+		}
+		
+		public void selectUsingCriteriaQuery() {
+			Session session=sessionFactory.openSession();
+			txn=session.beginTransaction();
+			Scanner sc =new Scanner(System.in);
+			CriteriaBuilder q=session.getCriteriaBuilder();
+			CriteriaQuery<Emp> c =q.createQuery(Emp.class);
+			Root r = c.from(Emp.class);
+			
+			c.select(r).where(q.equal(r.get("name"), "Raj"));
+			
+			List<Emp> results = session.createQuery(c).getResultList();
+			
+			for (Emp emp : results) {
+			    System.out.println(emp);
+			}
+
+			txn.commit();
 			session.close();
 		}
 }
